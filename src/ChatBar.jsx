@@ -22,10 +22,11 @@ class ChatBar extends Component {
         this.setState({ message: e.target.value });
     }
 
+// Upon pressing the enter key, the username and message content are set as the props - they are attached to both input tags via onKeyPress
     onMessageKeypress = (e) => {
         if(e.key === 'Enter') {
-            // this.props.onNewUsername(this.state.username);
             this.props.onNewMessage(this.state.username, this.state.message);
+            // Clear the message field after the props are set and message is submitted
             this.setState({ message: '' });
         }
     }

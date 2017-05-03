@@ -29,6 +29,7 @@ get newID() {
   return this.id += 2;
 }
 
+// Formats the data set acquired using onNewMessage
   makeMessage(username, content) {
     const id = this.newID;
     return {
@@ -38,6 +39,7 @@ get newID() {
     }
   }
 
+// Passed to ChatBar module and triggered upon press of the Enter key
   onNewMessage = (username, content) => {
     const newMessage = this.makeMessage(username, content);
     this.setState({
@@ -45,6 +47,7 @@ get newID() {
     });
   }
 
+// Renders html, including the contained modules
   render() {
     console.log("Rendering <App/>");
     return (

@@ -24,12 +24,25 @@ class App extends Component {
     this.state = Data;
     this.id = 1;
   }
-  
-get newID() {
-  return this.id += 2;
-}
 
-// Formats the data set acquired using onNewMessage
+  componentDidMount() {
+    this.socket = new WebSocket('ws://localhost:3001/');
+
+    this.socket.onopen = function(event) {
+      console.log('Connected to the server.');
+    }
+
+    this.socket.onmessage = function (event) {
+      console.log('On Message: ', event.data);
+    }
+  }
+
+  
+  get newID() {
+    return this.id += 2;
+  }
+
+  // Formats the data set acquired using onNewMessage
   makeMessage(username, content) {
     const id = this.newID;
     return {
@@ -39,15 +52,17 @@ get newID() {
     }
   }
 
-// Passed to ChatBar module and triggered upon press of the Enter key
+  // Passed to ChatBar module and triggered upon press of the Enter key
+  // message prop is then sent to the server-side via the socket
   onNewMessage = (username, content) => {
     const newMessage = this.makeMessage(username, content);
-    this.setState({
-      messages: this.state.messages.concat(newMessage),
-    });
+    // this.setState({
+    //   messages: this.state.messages.concat(newMessage),
+    // });
+    this.socket.send(JSON.stringify(newMessage));
   }
 
-// Renders html, including the contained modules
+  // Renders html, including the contained modules
   render() {
     console.log("Rendering <App/>");
     return (

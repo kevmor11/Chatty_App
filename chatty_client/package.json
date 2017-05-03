@@ -38,14 +38,15 @@
     "css-loader": "0.23.1",
     "eslint": "2.7.0",
     "eslint-plugin-react": "5.2.2",
-    "node-sass": "3.8.0",
-    "sass-loader": "4.0.0",
+    "node-sass": "4.5.2",
+    "sass-loader": "6.0.3",
     "sockjs-client": "^1.1.1",
     "style-loader": "0.13.1",
-    "webpack": "1.13.1",
+    "webpack": "2.4.1",
     "webpack-dev-server": "1.14.1"
   },
   "dependencies": {
+    "babel-loader": "^6.0.1",
     "react": "15.2.1",
     "react-dom": "15.2.1"
   }

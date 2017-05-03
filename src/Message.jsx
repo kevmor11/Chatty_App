@@ -1,6 +1,11 @@
-import React, {Component} from 'react';
+import React, {PropTypes, Component} from 'react';
 
 class Message extends Component {
+    static propTypes = {
+        username: PropTypes.string.isRequired,
+        message: PropTypes.string.isRequired
+    }
+
     render() {
         console.log("Rendering <Message/>");
         return (

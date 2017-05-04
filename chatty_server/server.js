@@ -1,5 +1,3 @@
-// server.js
-
 const express = require('express');
 const SocketServer = require('ws').Server;
 const uuidV1 = require('uuid/v1');
@@ -22,6 +20,7 @@ let outgoingMessage = '';
 // Set up a callback that will run when a client connects to the server
 // When a client connects they are assigned a socket, represented by
 // the ws parameter in the callback.
+// We then loop through the clients and send out incoming messages to each
 wss.on('connection', (ws) => {
   console.log('Client connected');
   ws.on('message', (message) => {

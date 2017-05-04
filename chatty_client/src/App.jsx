@@ -29,7 +29,7 @@ class App extends Component {
     }
   }
 
-  // Formats the data set acquired using onNewMessage
+  // Formats the data set (message) acquired using onNewMessage
   makeMessage(username, content) {
     return {
       username,
@@ -41,9 +41,6 @@ class App extends Component {
   // message prop is then sent to the server-side via the socket as a JSON string
   onNewMessage = (username, content) => {
     const newMessage = this.makeMessage(username, content);
-    // this.setState({
-    //   messages: this.state.messages.concat(newMessage),
-    // });
     this.socket.send(JSON.stringify(newMessage));
   }
 

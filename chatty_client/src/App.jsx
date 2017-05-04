@@ -2,58 +2,43 @@ import React, {Component} from 'react';
 import ChatBar from './ChatBar.jsx';
 import MessageList from './MessageList.jsx';
 
-const Data = {
-  currentUser: {name: "Bob"}, // optional. if currentUser is not defined, it means the user is Anonymous
-  messages: [
-    {
-      id: "1",
-      username: "Bob",
-      content: "Has anyone seen my marbles?",
-    },
-    {
-      id: "2",
-      username: "Anonymous",
-      content: "No, I think you lost them. You lost your marbles Bob. You lost them for good.",
-    }
-  ]
-};
-
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = Data;
-    this.id = 1;
+    this.state = {
+      currentUser: {name: "Bob"},
+      messages: [] // messages coming from the server will be stored here as they arrive
+    };
   }
 
+  // Once the components have mounted, initialize the socket connection to the server
   componentDidMount() {
     this.socket = new WebSocket('ws://localhost:3001/');
 
-    this.socket.onopen = function(event) {
+    // Upon connecting to the server, confirm the confirmation
+    this.socket.onopen = (event) => {
       console.log('Connected to the server.');
     }
 
-    this.socket.onmessage = function (event) {
-      console.log('On Message: ', event.data);
+    // Confirm that the client side can recieve messages from the server
+    this.socket.onmessage = (event) => {
+      console.log('event:', event)
+      const incomingMessage = JSON.parse(event.data);
+      console.log('Incoming message:', incomingMessage);
+      this.setState(this.state.messages = this.state.messages.concat(incomingMessage));
     }
-  }
-
-  
-  get newID() {
-    return this.id += 2;
   }
 
   // Formats the data set acquired using onNewMessage
   makeMessage(username, content) {
-    const id = this.newID;
     return {
-      id,
       username,
       content
     }
   }
 
   // Passed to ChatBar module and triggered upon press of the Enter key
-  // message prop is then sent to the server-side via the socket
+  // message prop is then sent to the server-side via the socket as a JSON string
   onNewMessage = (username, content) => {
     const newMessage = this.makeMessage(username, content);
     // this.setState({

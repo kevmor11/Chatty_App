@@ -15,10 +15,12 @@ class ChatBar extends Component {
         }
     }
 
+    // Set the state.username everytime the input field changes
     onUsernameChanged = (e) => {
         this.setState({ username: e.target.value });
     }
-
+  
+// Upon pressing the enter key, the username is set as a prop
     onUsernameKeypress = (e) => {
         if(e.key === 'Enter') {
             this.props.onNewUsername(e.target.value);
@@ -26,11 +28,12 @@ class ChatBar extends Component {
         }
     }
 
+    // Set the state.message everytime the input field changes
     onMessageChanged = (e) => {
         this.setState({ message: e.target.value });
     }
 
-// Upon pressing the enter key, the username and message content are set as the props - they are attached to both input tags via onKeyPress
+// Upon pressing the enter key, the message content is set as a prop - it is attached to the input tag via onKeyPress
     onMessageKeypress = (e) => {
         if(e.key === 'Enter') {
             this.props.onNewMessage(this.state.message);

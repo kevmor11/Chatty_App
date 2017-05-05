@@ -64,12 +64,6 @@ wss.on('connection', (ws) => {
       default:
         throw new Error('Unknown message type', parsedMessage.type);
     }
-    // if (parsedMessage.type === 'postMessage') {
-    //   parsedMessage.type = 'incomingMessage';
-    //   parsedMessage.color = userColor;
-    // } else if (parsedMessage.type === 'postNotification') {
-    //   parsedMessage.type = 'incomingNotification';
-    // }
     outgoingMessage = JSON.stringify(parsedMessage);
     broadcast(outgoingMessage);
   });

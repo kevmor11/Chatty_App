@@ -7,7 +7,7 @@ class App extends Component {
     super(props);
     this.state = {
       currentUser: {name: "Anonymous"},
-      userCount: '',
+      userCount: '', // total active users
       messages: [] // messages coming from the server will be stored here as they arrive
     };
   }
@@ -29,7 +29,6 @@ class App extends Component {
       switch(incomingMessage.type) {
         case 'incomingMessage':
           this.setState(this.state.messages = this.state.messages.concat(incomingMessage));
-          console.log(this.state.messages);
           break;
         case 'incomingNotification':
           this.setState(this.state.messages = this.state.messages.concat(incomingMessage));
@@ -55,6 +54,7 @@ class App extends Component {
     }
   }
 
+  // Formats the notification data set acquired using onNewUsername
   makeNotification(newUsername) {
     const oldName = this.state.currentUser.name;
     console.log('newName: ', newUsername);
@@ -65,13 +65,15 @@ class App extends Component {
     }   
   }
 
-  // Passed to ChatBar module and triggered upon press of the Enter key
-  // message prop is then sent to the server-side via the socket as a JSON string
+  // Passed to ChatBar module and triggered upon press of the Enter key in the message input
+  // message prop is then sent to the server-side via socket as a JSON string
   onNewMessage = (content) => {
     const newMessage = this.makeMessage(content);
     this.socket.send(JSON.stringify(newMessage));
   }
 
+  // Passed to ChatBar module and triggered upon press of the Enter key in the username input
+  // message prop is then sent to the server-side via socket as a JSON string
   onNewUsername = (user) => {
     const notify = this.makeNotification(user);
     this.setState({ currentUser: {name: user}});

@@ -8,7 +8,7 @@ class MessageList extends Component {
         // Loops through all messages contained in the props, maps them to an array which piped into a container rendered into Message.jsx
         var allMessages = this.props.messages.map((message) => {
             if (message.type === 'incomingMessage') {
-                return <Message key={message.id} username={message.username} content={message.content} color={message.color} />
+                return <Message key={message.id} username={message.username} content={message.content} color={message.color} img={message.img} />
             } else {
                 return <Notification key={message.id} content={message.content} />
             }

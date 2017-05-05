@@ -49,6 +49,10 @@ wss.on('connection', (ws) => {
   ws.on('message', (message) => {
     const parsedMessage = JSON.parse(message);
     parsedMessage.id = uuidV1();
+    const imageLinks = parsedMessage.content.match(/(https?:\/\/.*\.(?:png|jpeg|jpg|gif))/i);
+    if (imageLinks !== null) {
+      parsedMessage.img = imageLinks[1];
+    }
     console.log('type: ', parsedMessage.type);
     if (parsedMessage.type === 'postMessage') {
       parsedMessage.type = 'incomingMessage';

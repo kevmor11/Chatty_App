@@ -7,6 +7,7 @@ class App extends Component {
     super(props);
     this.state = {
       currentUser: {name: "Bob"},
+      userCount: '',
       messages: [] // messages coming from the server will be stored here as they arrive
     };
   }
@@ -25,23 +26,56 @@ class App extends Component {
       console.log('event:', event)
       const incomingMessage = JSON.parse(event.data);
       console.log('Incoming message:', incomingMessage);
-      this.setState(this.state.messages = this.state.messages.concat(incomingMessage));
+      switch(incomingMessage.type) {
+        case 'incomingMessage':
+          this.setState(this.state.messages = this.state.messages.concat(incomingMessage));
+          console.log(this.state.messages);
+          break;
+        case 'incomingNotification':
+          this.setState(this.state.messages = this.state.messages.concat(incomingMessage));
+          break;
+        case 'usersCount':
+          this.setState({userCount: incomingMessage.usersOnline});
+          console.log('usersCount', event.data);
+          break;
+        default:
+          throw new Error('Unknown event type: ' + event.data.type);
+      }
     }
   }
 
   // Formats the data set (message) acquired using onNewMessage
-  makeMessage(username, content) {
+  makeMessage(content) {
+    const username = this.state.currentUser.name
+    const type = 'postMessage';
     return {
+      type,
       username,
       content
     }
   }
 
+  makeNotification(newUsername) {
+    const oldName = this.state.currentUser.name;
+    console.log('newName: ', newUsername);
+    console.log('oldName: ', oldName); 
+    return {
+      type: 'postNotification',
+      content: `User ${oldName} changed their name to ${newUsername}`
+    }   
+  }
+
   // Passed to ChatBar module and triggered upon press of the Enter key
   // message prop is then sent to the server-side via the socket as a JSON string
-  onNewMessage = (username, content) => {
-    const newMessage = this.makeMessage(username, content);
+  onNewMessage = (content) => {
+    const newMessage = this.makeMessage(content);
     this.socket.send(JSON.stringify(newMessage));
+  }
+
+  onNewUsername = (user) => {
+    const notify = this.makeNotification(user);
+    this.setState({ currentUser: {name: user}});
+    this.socket.send(JSON.stringify(notify));
   }
 
   // Renders html, including the contained modules
@@ -50,10 +84,14 @@ class App extends Component {
     return (
       <div>
         <nav className="navbar">
-          <a href="/" className="navbar-brand">Chatty</a>
+          <a href="/" className="navbar-brand">ChattyApp</a>
+          <img src="https://freeiconshop.com/wp-content/uploads/edd/chat-alt-outline.png" className="icon"/>
+          <div className='user-count'>
+            <p>{this.state.userCount} users online.</p>
+          </div>
         </nav>
         <MessageList messages={this.state.messages} />
-        <ChatBar user={this.state.currentUser.name} onNewMessage={this.onNewMessage} />
+        <ChatBar user={this.state.currentUser.name} onNewMessage={this.onNewMessage} onNewUsername={this.onNewUsername} />
       </div>
     );
   }

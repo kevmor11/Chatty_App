@@ -17,21 +17,48 @@ const wss = new SocketServer({ server });
 
 let outgoingMessage = '';
 
+function makeUserCountMessage(usersOnline) {
+  const type = 'usersCount';
+  return {
+    type,
+    usersOnline,
+  };
+}
+
+function broadcast(data) {
+  wss.clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(data);
+    }
+  });
+}
+
+const colors = ['#4286f4', '#37e855', '#ef6c26', '#d820ba'];
+let connectionID = 0;
+
 // Set up a callback that will run when a client connects to the server
 // When a client connects they are assigned a socket, represented by
 // the ws parameter in the callback.
 // We then loop through the clients and send out incoming messages to each
 wss.on('connection', (ws) => {
+  ws.id = connectionID ++;
+  const userColor = colors[ws.id % colors.length]
+  const userCountMessage = makeUserCountMessage(wss.clients.size.toString());  
   console.log('Client connected');
+  broadcast(JSON.stringify(userCountMessage));
   ws.on('message', (message) => {
     const parsedMessage = JSON.parse(message);
     parsedMessage.id = uuidV1();
+    console.log('type: ', parsedMessage.type);
+    if (parsedMessage.type === 'postMessage') {
+      parsedMessage.type = 'incomingMessage';
+      parsedMessage.color = userColor;
+    } else if (parsedMessage.type === 'postNotification') {
+      parsedMessage.type = 'incomingNotification';
+    }
+    // parsedMessage.type = 'incomingMessage';
     outgoingMessage = JSON.stringify(parsedMessage);
-    wss.clients.forEach((client) => {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(outgoingMessage);
-      }
-    });
+    broadcast(outgoingMessage);
   });
 
 

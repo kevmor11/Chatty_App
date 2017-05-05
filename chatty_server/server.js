@@ -42,7 +42,7 @@ let connectionID = 0;
 // We then loop through the clients and send out incoming messages to each
 wss.on('connection', (ws) => {
   ws.id = connectionID ++;
-  const userColor = colors[ws.id % colors.length]
+  const userColor = colors[ws.id % colors.length];
   const userCountMessage = makeUserCountMessage(wss.clients.size.toString());  
   console.log('Client connected');
   broadcast(JSON.stringify(userCountMessage));
@@ -53,14 +53,23 @@ wss.on('connection', (ws) => {
     if (imageLinks !== null) {
       parsedMessage.img = imageLinks[1];
     }
-    console.log('type: ', parsedMessage.type);
-    if (parsedMessage.type === 'postMessage') {
-      parsedMessage.type = 'incomingMessage';
-      parsedMessage.color = userColor;
-    } else if (parsedMessage.type === 'postNotification') {
-      parsedMessage.type = 'incomingNotification';
+    switch  (parsedMessage.type) {
+      case 'postMessage':
+        parsedMessage.type = 'incomingMessage';
+        parsedMessage.color = userColor;
+        break;
+      case 'postNotification':
+        parsedMessage.type = 'incomingNotification';
+        break;
+      default:
+        throw new Error('Unknown message type', parsedMessage.type);
     }
-    // parsedMessage.type = 'incomingMessage';
+    // if (parsedMessage.type === 'postMessage') {
+    //   parsedMessage.type = 'incomingMessage';
+    //   parsedMessage.color = userColor;
+    // } else if (parsedMessage.type === 'postNotification') {
+    //   parsedMessage.type = 'incomingNotification';
+    // }
     outgoingMessage = JSON.stringify(parsedMessage);
     broadcast(outgoingMessage);
   });

@@ -2,7 +2,7 @@ import React, {PropTypes, Component} from 'react';
 
 class Notification extends Component {
     static propTypes = {
-        message: PropTypes.string.isRequired
+        message: PropTypes.string
     }
 
     render() {

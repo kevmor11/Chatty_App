@@ -16,26 +16,16 @@ class App extends Component {
   componentDidMount() {
     this.socket = new WebSocket('ws://localhost:3001/');
 
-    // Upon connecting to the server, confirm the confirmation
-    this.socket.onopen = (event) => {
-      console.log('Connected to the server.');
-    }
-
     // Confirm that the client side can recieve messages from the server
     this.socket.onmessage = (event) => {
-      console.log('event:', event)
       const incomingMessage = JSON.parse(event.data);
-      console.log('Incoming message:', incomingMessage);
       switch(incomingMessage.type) {
         case 'incomingMessage':
-          this.setState(this.state.messages = this.state.messages.concat(incomingMessage));
-          break;
         case 'incomingNotification':
           this.setState(this.state.messages = this.state.messages.concat(incomingMessage));
           break;
         case 'usersCount':
           this.setState({userCount: incomingMessage.usersOnline});
-          console.log('usersCount', event.data);
           break;
         default:
           throw new Error('Unknown event type: ' + event.data.type);
@@ -57,12 +47,10 @@ class App extends Component {
   // Formats the notification data set acquired using onNewUsername
   makeNotification(newUsername) {
     const oldName = this.state.currentUser.name;
-    console.log('newName: ', newUsername);
-    console.log('oldName: ', oldName); 
     return {
       type: 'postNotification',
       content: `User ${oldName} changed their name to ${newUsername}`
-    }   
+    }
   }
 
   // Passed to ChatBar module and triggered upon press of the Enter key in the message input
@@ -82,7 +70,6 @@ class App extends Component {
 
   // Renders html, including the contained modules
   render() {
-    console.log("Rendering <App/>");
     return (
       <div>
         <nav className="navbar">

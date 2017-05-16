@@ -4,7 +4,6 @@ import Notification from './Notification.jsx';
 
 class MessageList extends Component {
     render() {
-        console.log("Rendering <MessageList/>");
         // Loops through all messages contained in the props, maps them to an array which piped into a container rendered into Message.jsx
         var allMessages = this.props.messages.map((message) => {
             if (message.type === 'incomingMessage') {

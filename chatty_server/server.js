@@ -10,12 +10,10 @@ const PORT = 3001;
 const server = express()
    // Make the express server serve static assets (html, javascript, css) from the /public folder
   .use(express.static('public'))
-  .listen(PORT, '0.0.0.0', 'localhost', () => console.log(`Listening on ${PORT}`));
+  .listen(PORT, '0.0.0.0', 'localhost');
 
 // Create the WebSockets server
 const wss = new SocketServer({ server });
-
-let outgoingMessage = '';
 
 function makeUserCountMessage(usersOnline) {
   const type = 'usersCount';
@@ -28,7 +26,7 @@ function makeUserCountMessage(usersOnline) {
 function broadcast(data) {
   wss.clients.forEach((client) => {
     if (client.readyState === WebSocket.OPEN) {
-      client.send(data);
+      client.send(JSON.stringify(data));
     }
   });
 }
@@ -41,11 +39,9 @@ let connectionID = 0;
 // the ws parameter in the callback.
 // We then loop through the clients and send out incoming messages to each
 wss.on('connection', (ws) => {
-  ws.id = connectionID ++;
-  const userColor = colors[ws.id % colors.length];
-  const userCountMessage = makeUserCountMessage(wss.clients.size.toString());  
-  console.log('Client connected');
-  broadcast(JSON.stringify(userCountMessage));
+  const userColor = colors[++connectionID % colors.length];
+  const userCountMessage = makeUserCountMessage(wss.clients.size.toString());
+  broadcast(userCountMessage);
   ws.on('message', (message) => {
     const parsedMessage = JSON.parse(message);
     parsedMessage.id = uuidV1();
@@ -53,7 +49,7 @@ wss.on('connection', (ws) => {
     if (imageLinks !== null) {
       parsedMessage.img = imageLinks[1];
     }
-    switch  (parsedMessage.type) {
+    switch (parsedMessage.type) {
       case 'postMessage':
         parsedMessage.type = 'incomingMessage';
         parsedMessage.color = userColor;
@@ -64,12 +60,15 @@ wss.on('connection', (ws) => {
       default:
         throw new Error('Unknown message type', parsedMessage.type);
     }
-    outgoingMessage = JSON.stringify(parsedMessage);
-    broadcast(outgoingMessage);
+    broadcast(parsedMessage);
   });
 
 
   // Set up a callback for when a client closes the socket.
   // This usually means they closed their browser.
-  ws.on('close', () => console.log('Client disconnected'));
+  // TODO: on close, reduce the online user count accordingly
+  ws.on('close', () => {
+    console.log('Client disconnected');
+    broadcast(makeUserCountMessage(wss.clients.size));
+  });
 });

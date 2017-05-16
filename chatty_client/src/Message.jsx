@@ -8,7 +8,6 @@ class Message extends Component {
     }
 
     render() {
-        console.log("Rendering <Message/>");
         let imgTag;
         if(this.props.img) {
             imgTag = (<img style={{"maxWidth": "30%", "float": "right"}} src={this.props.img} />)
